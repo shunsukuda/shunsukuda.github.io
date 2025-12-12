@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Parsing Verification</title>
+</head>
+
+<body>
+    <div id="logs" style="white-space: pre-wrap; font-family: monospace;"></div>
+    <script src="app.js"></script>
+    <script>
+        function log(msg) {
+            const div = document.getElementById('logs');
+            div.textContent += msg + '\n';
+        }
+
+        async function run() {
+            try {
+                log('Fetching sample.mhtml...');
+                const response = await fetch('sample.mhtml');
+                const mhtmlContent = await response.text();
+
+                log('Extracting Chat Data...');
+                const chatData = extractChatFromMhtml(mhtmlContent);
+
+                log(`Extracted ${chatData.messages.length} messages.`);
+                log('--- Content Preview (checking for filenames) ---');
+
+                chatData.messages.forEach((msg, i) => {
+                    if (msg.role === 'assistant' && msg.content.includes('```')) {
+                        log(`\n[Message ${i}]`);
+                        // Find lines around code blocks
+                        const lines = msg.content.split('\n');
+                        for (let j = 0; j < lines.length; j++) {
+                            if (lines[j].startsWith('```')) {
+                                // Show previous line (potential filename) and current line
+                                if (j > 0) log(`  Prev Line: ${lines[j - 1]}`);
+                                log(`  Code Start: ${lines[j]}`);
+                                // Show next few lines
+                                if (j + 1 < lines.length) log(`  Line +1: ${lines[j + 1].substring(0, 50)}...`);
+                            }
+                        }
+                    }
+                });
+
+            } catch (e) {
+                log('Error: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', run);
+    </script>
+</body>
+
+</html>

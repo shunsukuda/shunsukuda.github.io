@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DOM Investigation</title>
+</head>
+
+<body>
+    <div id="logs" style="white-space: pre-wrap; font-family: monospace;"></div>
+    <script src="app.js"></script>
+    <script>
+        function log(msg) {
+            const div = document.getElementById('logs');
+            div.textContent += msg + '\n';
+        }
+
+        async function run() {
+            try {
+                log('Fetching sample.mhtml...');
+                const response = await fetch('sample.mhtml');
+                const mhtmlContent = await response.text();
+
+                log('Parsing MHTML...');
+                const parts = parseMhtml(mhtmlContent);
+                const htmlPart = findMainHtmlPart(parts);
+
+                if (!htmlPart) {
+                    log('Error: No HTML part found');
+                    return;
+                }
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlPart.content, 'text/html');
+
+                log('--- Searching for "思考プロセス" ---');
+                // XPath to find text node containing "思考プロセスを表示"
+                const xpath = "//*[contains(text(), '思考プロセスを表示')]";
+                const iterator = doc.evaluate(xpath, doc, null, XPathResult.ANY_TYPE, null);
+                let node = iterator.iterateNext();
+
+                while (node) {
+                    log(`Found Node: <${node.tagName.toLowerCase()} class="${node.className}">`);
+                    log(`Parent: <${node.parentElement.tagName.toLowerCase()} class="${node.parentElement.className}">`);
+                    log(`Grandparent: <${node.parentElement.parentElement?.tagName.toLowerCase()} class="${node.parentElement.parentElement?.className}">`);
+                    // Check if there is a container for thoughts
+                    const container = node.closest('model-thought') || node.closest('.thought') || node.closest('div[class*="thought"]');
+                    if (container) {
+                        log(`Potential Container: <${container.tagName} class="${container.className}">`);
+                    }
+                    node = iterator.iterateNext();
+                }
+
+                log('\n--- Searching for Code Blocks ---');
+                // Look for common code block indicators
+                const preTags = doc.querySelectorAll('pre');
+                log(`Found ${preTags.length} <pre> tags`);
+                if (preTags.length > 0) {
+                    log('Sample <pre> outerHTML: ' + preTags[0].outerHTML.substring(0, 200));
+                }
+
+                const codeTags = doc.querySelectorAll('code');
+                log(`Found ${codeTags.length} <code> tags`);
+
+                const codeBlocks = doc.querySelectorAll('code-block');
+                log(`Found ${codeBlocks.length} <code-block> tags`);
+                if (codeBlocks.length > 0) {
+                    log('Sample <code-block> outerHTML: ' + codeBlocks[0].outerHTML.substring(0, 200));
+                }
+
+            } catch (e) {
+                log('Error: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', run);
+    </script>
+</body>
+
+</html>

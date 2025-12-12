@@ -1,0 +1,12 @@
+
+# OS specific
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Temp
+tmp/
+temp/

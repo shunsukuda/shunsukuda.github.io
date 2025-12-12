@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Chat Log Converter</title>
+    <meta name="description" content="Gemini のチャットログを Markdown, JSON, TOON 形式に変換">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+        integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script type="module">
+        import * as TOON from 'https://cdn.jsdelivr.net/npm/@toon-format/toon@2.1.0/dist/index.mjs';
+        window.TOON = TOON;
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-text">Gemini Chat Log Converter</span>
+            </div>
+            <!-- h1削除またはロゴと統合 -->
+            <p class="subtitle">MHTML ファイルを Markdown, JSON, TOON に変換</p>
+        </header>
+
+        <main class="main">
+            <!-- Instructions -->
+            <section class="instructions">
+                <h2>📖 使い方</h2>
+                <ol>
+                    <li><a href="https://gemini.google.com" target="_blank">gemini.google.com</a> でチャットを開く
+                        <br>
+                        <small style="color: #ccc; display: flex; margin-top: 0.5em; gap: 0.5em;">
+                            <span style="flex-shrink: 0;">💡 ヒント:</span>
+                            <span>正確に保存するためには？左メニューを閉じる(推奨)<br>ページ最上部から最下部まで高速スクロールして全コンテンツを読み込んでください。</span>
+                        </small>
+                    </li>
+                    <li><kbd>Ctrl</kbd> + <kbd>S</kbd> → 「ウェブページ、単一ファイル (.mhtml)」で保存</li>
+                    <li>下のエリアに保存したファイルをドロップ</li>
+                </ol>
+            </section>
+
+            <!-- File Drop Zone -->
+            <section class="file-section">
+                <div class="file-drop-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept=".mhtml,.mht" multiple hidden>
+                    <div class="drop-content">
+                        <span class="drop-icon">📂</span>
+                        <p class="drop-text">MHTML ファイルをドラッグ&ドロップ（複数可）</p>
+                        <p class="or">または</p>
+                        <button type="button" id="select-btn" class="pure-button select-button">ファイルを選択</button>
+                    </div>
+                </div>
+
+                <div id="file-info" class="file-info hidden">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name"></span>
+                    <span class="file-size"></span>
+                    <button type="button" id="clear-btn" class="pure-button clear-button" title="クリア">✕</button>
+                </div>
+            </section>
+
+            <!-- Format Selection -->
+            <section class="format-section">
+                <h2>📤 エクスポート形式</h2>
+                <div class="format-options pure-g">
+                    <label class="format-option pure-u-1 pure-u-sm-1-3">
+                        <input type="radio" name="format" value="markdown" checked>
+                        <span class="format-card">
+                            <span class="format-icon">📝</span>
+                            <span class="format-name">Markdown</span>
+                            <span class="format-desc">人間が読みやすい形式</span>
+                        </span>
+                    </label>
+                    <label class="format-option pure-u-1 pure-u-sm-1-3">
+                        <input type="radio" name="format" value="json">
+                        <span class="format-card">
+                            <span class="format-icon">{ }</span>
+                            <span class="format-name">JSON</span>
+                            <span class="format-desc">構造化データ</span>
+                        </span>
+                    </label>
+                    <label class="format-option pure-u-1 pure-u-sm-1-3">
+                        <input type="radio" name="format" value="toon">
+                        <span class="format-card">
+                            <span class="format-icon">🤖</span>
+                            <span class="format-name">TOON</span>
+                            <span class="format-desc">LLM最適化形式</span>
+                        </span>
+                    </label>
+                </div>
+                <!-- TOON Prompt Input -->
+                <div id="toon-prompt-container" class="prompt-container hidden">
+                    <h2>💬 プロンプト</h2>
+                    <textarea id="toon-prompt" class="prompt-textarea"
+                        rows="3">これはGeminiとのチャットログです。内容を要約してください。</textarea>
+                </div>
+            </section>
+
+            <!-- Convert Button -->
+            <button id="convert-btn" class="pure-button pure-button-primary convert-button" disabled>
+                <span class="btn-icon">🔄</span>
+                <span class="btn-text">変換DL</span>
+            </button>
+
+            <!-- Status -->
+            <div id="status" class="status hidden"></div>
+
+            <!-- Preview -->
+            <section id="preview-section" class="preview-section hidden">
+                <h2>👁️ プレビュー</h2>
+                <div class="preview-header">
+                    <span id="preview-count"></span>
+                    <button id="copy-btn" class="pure-button copy-button">📋 コピー</button>
+                </div>
+                <pre id="preview" class="preview"></pre>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p class="copyright">© 2025 Gemini Chat Log Converter</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
