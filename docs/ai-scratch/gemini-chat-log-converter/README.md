@@ -2,7 +2,7 @@
 
 Gemini のチャットログ（MHTML/HTML）を **Markdown**、**JSON**、**TOON** 形式に変換する Web アプリ。
 
-🔗 **[オンラインで使用する](https://shunsukuda.github.io/ai-scratch/gemini-chat-log-converter)**
+🔗 **[オンラインで使用する](https://shunsukuda.github.io/ai-scratch/gemini-chat-log-converter/)**
 
 ---
 
