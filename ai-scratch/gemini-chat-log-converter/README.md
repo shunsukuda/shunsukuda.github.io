@@ -2,7 +2,7 @@
 
 Gemini のチャットログ（MHTML/HTML）を **Markdown**、**JSON**、**TOON** 形式に変換する Web アプリ。
 
-🔗 **[オンラインで使用する](https://yourusername.github.io/gemini-chat-saver/)**
+🔗 **[オンラインで使用する](https://shunsukuda.github.io/gemini-chat-saver/)**
 
 ---
 
@@ -45,14 +45,6 @@ npx serve .
 ```
 
 ブラウザで http://localhost:8000 を開く
-
----
-
-## GitHub Pages にデプロイ
-
-1. このリポジトリをフォーク or コピー
-2. **Settings** → **Pages** → **Source** を `main` ブランチに設定
-3. 数分後に `https://yourusername.github.io/gemini-chat-saver/` でアクセス可能
 
 ---
 
